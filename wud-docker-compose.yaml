@@ -1,0 +1,32 @@
+version: "3"
+services:
+  wud:
+    image: getwud/wud
+    container_name: wud
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/docker-compose:/compose
+    ports:
+      - 3000:3000
+    environment:
+      TZ: Europe/Berlin
+      WUD_WATCHER_LOCAL_CRON: 0 */6 * * *
+      # MQTT
+      WUD_TRIGGER_MQTT_MOSQUITTO_URL: mqtt://ip:1883
+      WUD_TRIGGER_MQTT_MOSQUITTO_USER: username
+      WUD_TRIGGER_MQTT_MOSQUITTO_PASSWORD: password
+      WUD_TRIGGER_MQTT_MOSQUITTO_HASS_ENABLED: true
+      WUD_TRIGGER_MQTT_MOSQUITTO_HASS_DISCOVERY: true
+      WUD_TRIGGER_MQTT_MOSQUITTO_THRESHOLD: minor
+      # Docker Compose
+      WUD_TRIGGER_DOCKERCOMPOSE_{SERVICE}-PATCH_FILE: /compose/{service}/compose.yaml
+      WUD_TRIGGER_DOCKERCOMPOSE_{SERVICE}-PATCH_PRUNE: true
+      WUD_TRIGGER_DOCKERCOMPOSE_{SERVICE}-PATCH_THRESHOLD: patch
+      WUD_TRIGGER_DOCKERCOMPOSE_{SERVICE}-UPDATE_FILE: /compose/{service}/compose.yaml
+      WUD_TRIGGER_DOCKERCOMPOSE_{SERVICE}-UPDATE_PRUNE: true
+      WUD_TRIGGER_DOCKERCOMPOSE_{SERVICE}-UPDATE_THRESHOLD: major
+      WUD_TRIGGER_DOCKERCOMPOSE_{SERVICE}-UPDATE_AUTO: false
+    labels:
+      - wud.tag.include=^\d+\.\d+\.\d+$$
+      - wud.link.template=https://github.com/getwud/wud/releases/tag/$${major}.$${minor}.$${patch}

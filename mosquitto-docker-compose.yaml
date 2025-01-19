@@ -1,0 +1,16 @@
+version: "3"
+services:
+  mosquitto:
+    image: eclipse-mosquitto:openssl
+    container_name: mosquitto
+    restart: unless-stopped
+    volumes:
+      - ${DOCKER_DATA_PATH}/mosquitto/config:/mosquitto/config
+      - ${DOCKER_DATA_PATH}/mosquitto/data:/mosquitto/data
+      - ${DOCKER_DATA_PATH}/mosquitto/log:/mosquitto/log
+    ports:
+      - 1883:1883
+      - 8883:8883
+    labels:
+      - wud.tag.include=^\d+\.\d+\.\d+-openssl$$
+      - wud.link.template=https://github.com/eclipse-mosquitto/mosquitto/tag/v$${major}.$${minor}.$${patch}
